@@ -88,7 +88,7 @@
                     <Label Name="ContrastLabel" Content="Contrast"/>
                     <Slider Name="ContrastSlider" Maximum="5" Value="1.5" IsEnabled="True" ValueChanged="ContrastSlider_ValueChanged"/>
                     <Label Name="FpsLabel" Content="fps"/>
-                    <Slider Name="FpsSlider" ValueChanged="FpsSlider_ValueChanged" Value="1" Minimum="0.1"  Maximum="2" IsEnabled="True"/>
+                    <Slider Name="FpsSlider" ValueChanged="FpsSlider_ValueChanged" Value="1" Minimum="0.1"  Maximum="3" IsEnabled="True"/>
 
                     <!--
                     <Grid Margin="0 5">
