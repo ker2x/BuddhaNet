@@ -91,8 +91,10 @@ namespace Buddhanet
                     y = (int)(MainWindow.imageHeight * ((z.Imaginary - minIm) / (maxIm - minIm)));
                     if (x > 0 && y > 0 && x < MainWindow.imageWidth && y < MainWindow.imageHeight && iter > MainWindow.minIter)
                     {
-
-                        MainWindow.screenBuffer[x, y,0]++;
+                        //MainWindow.screenBuffer[x, y,0]++;
+                        if(iter >= MainWindow.rmin && iter <= MainWindow.rmax) MainWindow.screenBuffer[x, y, 0]++;
+                        if (iter >= MainWindow.gmin && iter <= MainWindow.gmax) MainWindow.screenBuffer[x, y, 1]++;
+                        if (iter >= MainWindow.bmin && iter <= MainWindow.bmax) MainWindow.screenBuffer[x, y, 2]++;
                     }
                 }
 

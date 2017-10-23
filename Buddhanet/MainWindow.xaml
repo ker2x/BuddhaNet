@@ -49,8 +49,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Red" Grid.Column="0" Foreground="Red"/>
-                        <xctk:IntegerUpDown Name="RedMin" Minimum="0" Grid.Column="1"/>
-                        <xctk:IntegerUpDown Name="RedMax" Minimum="0" Grid.Column="2"/>
+                        <xctk:IntegerUpDown Name="RedMin" Minimum="0" Grid.Column="1" ValueChanged="RedMin_ValueChanged"/>
+                        <xctk:IntegerUpDown Name="RedMax" Minimum="0" Grid.Column="2" ValueChanged="RedMax_ValueChanged"/>
                     </Grid>
 
                     <!-- green-->
@@ -61,8 +61,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Green" Grid.Column="0" Foreground="Green"/>
-                        <xctk:IntegerUpDown Name="GreenMin" Minimum="0" Grid.Column="1"/>
-                        <xctk:IntegerUpDown Name="GreenMax" Minimum="0" Grid.Column="2"/>
+                        <xctk:IntegerUpDown Name="GreenMin" Minimum="0" Grid.Column="1" ValueChanged="GreenMin_ValueChanged"/>
+                        <xctk:IntegerUpDown Name="GreenMax" Minimum="0" Grid.Column="2" ValueChanged="GreenMax_ValueChanged"/>
                     </Grid>
 
                     <!-- blue-->
@@ -73,8 +73,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="Blue" Grid.Column="0" Foreground="Blue"/>
-                        <xctk:IntegerUpDown Name="BlueMin" Minimum="0" Grid.Column="1"/>
-                        <xctk:IntegerUpDown Name="BlueMax" Minimum="0" Grid.Column="2"/>
+                        <xctk:IntegerUpDown Name="BlueMin" Minimum="0" Grid.Column="1" ValueChanged="BlueMin_ValueChanged"/>
+                        <xctk:IntegerUpDown Name="BlueMax" Minimum="0" Grid.Column="2" ValueChanged="BlueMax_ValueChanged"/>
 
                     </Grid>
                 </StackPanel>

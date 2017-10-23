@@ -43,9 +43,10 @@ namespace Buddhanet
         public static int[,,] screenBuffer = new int[imageWidth, imageHeight,3];
         public static double maxRe, minRe, maxIm, minIm;
         public static int minIter = 100;
-        public static int maxIter = 2000;
+        public static int maxIter = 300;
         public static bool isPaused = false;
         public static object pauseLock = new object();
+        public static int rmin, rmax, gmin, gmax, bmin, bmax;
 
         double contrast, luminosity;
         double fps = 1;
@@ -59,10 +60,18 @@ namespace Buddhanet
 
             //Set Default Values
             FpsSlider.Value = 1;
-            RedMin.Value = 10; RedMax.Value = 20;
-            GreenMin.Value = 15; GreenMax.Value = 25;
-            BlueMin.Value = 20; BlueMax.Value = 30;
-            //NumThread.Value = 1;
+            RedMin.Value = 100; RedMax.Value = 200;
+            GreenMin.Value = 150; GreenMax.Value = 250;
+            BlueMin.Value = 200; BlueMax.Value = 300;
+
+            rmin = (int)RedMin.Value;
+            rmax = (int)RedMax.Value;
+            gmin = (int)GreenMin.Value;
+            gmax = (int)GreenMax.Value;
+            bmin = (int)BlueMin.Value;
+            bmax = (int)BlueMax.Value;
+
+
 
             minRe = -2.0 / 1.2;
             maxRe = 2.0 / 1.2;
@@ -125,12 +134,19 @@ namespace Buddhanet
             while (true)
             {
                 //Find max value
-                int max = 0;
+                int redmax = 0;
+                int greenmax = 0;
+                int bluemax = 0;
+
+
+
                 for (int j = 0; j < imageHeight; j++)
                 {
                     for (int i = 0; i < imageWidth; i++)
                     {
-                        max = Math.Max(max, screenBuffer[i, j, 0]);
+                        redmax = Math.Max(redmax, screenBuffer[i, j, 0]);
+                        greenmax = Math.Max(greenmax, screenBuffer[i, j, 1]);
+                        bluemax = Math.Max(bluemax, screenBuffer[i, j, 2]);
                     }
                 }
 
@@ -140,11 +156,13 @@ namespace Buddhanet
                     {
                         for (int i = 0; i < imageWidth; i++)
                         {
-                            int newval = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)max) * 255), contrast) + luminosity, 255.0);
+                            int r = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)redmax) * 255), contrast) + luminosity, 255.0);
+                            int g = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 1] / (float)greenmax) * 255), contrast) + luminosity, 255.0);
+                            int b = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 2] / (float)bluemax) * 255), contrast) + luminosity, 255.0);
                             int c;
-                            c = newval << 16;
-                            c |= newval << 8;
-                            c |= newval;
+                            c = b << 16;
+                            c |= g << 8;
+                            c |= r;
                             int offset = (i * 4) + (item * MainWindow.imageWidth * 4);
                             unsafe { Marshal.WriteInt32((IntPtr)pBackBuffer, offset, c); }
                         }
@@ -213,6 +231,42 @@ namespace Buddhanet
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void RedMin_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            rmin = (int)e.NewValue;
+            minIter = Math.Min(rmin, Math.Min(gmin, bmin));
+        }
+
+        private void RedMax_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            rmax = (int)e.NewValue;
+            maxIter = Math.Max(rmax, Math.Max(gmax, bmax));
+        }
+
+        private void GreenMin_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            gmin = (int)e.NewValue;
+            minIter = Math.Min(rmin, Math.Min(gmin, bmin));
+        }
+
+        private void GreenMax_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            gmax = (int)e.NewValue;
+            maxIter = Math.Max(rmax, Math.Max(gmax, bmax));
+        }
+
+        private void BlueMin_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            bmin = (int)e.NewValue;
+            minIter = Math.Min(rmin, Math.Min(gmin, bmin));
+        }
+
+        private void BlueMax_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            bmax = (int)e.NewValue;
+            maxIter = Math.Max(rmax, Math.Max(gmax, bmax));
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
