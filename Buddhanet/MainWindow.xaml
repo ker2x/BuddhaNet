@@ -84,7 +84,7 @@
             <GroupBox Header="Rendering settings">
                 <StackPanel Margin="5">
                     <Label Name="LuminosityLabel" Content="Luminosity"/>
-                    <Slider Name="LuminositySlider" Maximum="128" Value="1" IsEnabled="True" ValueChanged="LuminositySlider_ValueChanged"/>
+                    <Slider Name="LuminositySlider" Maximum="10" Value="1" IsEnabled="True" ValueChanged="LuminositySlider_ValueChanged"/>
                     <Label Name="ContrastLabel" Content="Contrast"/>
                     <Slider Name="ContrastSlider" Maximum="5" Value="1.5" IsEnabled="True" ValueChanged="ContrastSlider_ValueChanged"/>
                     <Label Name="FpsLabel" Content="fps"/>

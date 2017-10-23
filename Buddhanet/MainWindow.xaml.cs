@@ -140,6 +140,7 @@ namespace Buddhanet
 
 
 
+
                 for (int j = 0; j < imageHeight; j++)
                 {
                     for (int i = 0; i < imageWidth; i++)
@@ -152,32 +153,25 @@ namespace Buddhanet
 
                 //lock (bmp)    //Should do something in order to not update the bmp while saving. but locking sux.
                 //{
-                    Parallel.For(1, imageHeight , item =>
+                Parallel.For(1, imageHeight, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount / 2 } , item =>
                     {
                         for (int i = 0; i < imageWidth -1 ; i++)
                         {
-                            int r = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)redmax) * 255), contrast) + luminosity, 255.0);
-                            int g = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 1] / (float)greenmax) * 255), contrast) + luminosity, 255.0);
-                            int b = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 2] / (float)bluemax) * 255), contrast) + luminosity, 255.0);
-                            int c;
+                            uint r = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)redmax) * 255), contrast) * luminosity, 255.0);
+                            uint g = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 1] / (float)greenmax) * 255), contrast) * luminosity, 255.0);
+                            uint b = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 2] / (float)bluemax) * 255), contrast) * luminosity, 255.0);
+                            uint c;
                             c = b << 16;
                             c |= g << 8;
                             c |= r;
-                            int offset = (i * 4) + (item * MainWindow.imageWidth * 4);
-                            //unsafe { Marshal.WriteInt32((IntPtr)pBackBuffer, offset, c); }
-                            //IntPtr pBackBuffer = (bmp.BackBuffer);
-                            //IntPtr pPixel = IntPtr.Add(pBackBuffer, offset);
                             unsafe
                             {
-                                long pPixel = (long)pBuffer + offset;
-                                //pPixel += offset;
-                                *((long*)pPixel) = c;
+                                *((uint*)pBuffer + i + item * MainWindow.imageWidth) = c;
                             }
                         }
 
                     });
                     Thread.Sleep((int)(1000 / fps));
-                    //Debug.WriteLine(max);
                 //}
                 //lock (pauseLock) { }; // Should we lock the screenUpdater while pausing ? i doubt it...
             }
