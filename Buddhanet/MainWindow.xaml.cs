@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.IO;
 
 using Xceed.Wpf.Toolkit;
 
@@ -175,6 +176,9 @@ namespace Buddhanet
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+
+
+
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.DefaultExt = ".png";
             saveFileDialog.Filter = "PNG (.png)|*.png";
@@ -183,6 +187,12 @@ namespace Buddhanet
             {
                 //saveFileDialog.FileName;
                 //DO STUFF HERE
+
+                FileStream stream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+                encoder.Save(stream);
+
                 System.Windows.MessageBox.Show($"File saved : {saveFileDialog.FileName}");
             }
             else

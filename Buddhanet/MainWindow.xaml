@@ -115,7 +115,7 @@
             <!-- Main-->
             <GroupBox Header="Main" Margin="0 5">
                 <StackPanel>
-                    <Button Name="SaveButton" Click="SaveButton_Click" Content="Save as ..." Margin="0,2" IsEnabled="False"/>
+                    <Button Name="SaveButton" Click="SaveButton_Click" Content="Save as ..." Margin="0,2" IsEnabled="True"/>
                     <Button Name="QuitButton" Click="QuitButton_Click" Content="Quit" Margin="0,2"/>
 
                 </StackPanel>
