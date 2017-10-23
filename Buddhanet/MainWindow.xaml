@@ -1,0 +1,173 @@
+﻿<Window x:Class="Buddhanet.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:Buddhanet"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1600">
+
+    <!-- MAIN-->
+    <Grid MinWidth="400" Margin="0">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT PANEL-->
+        <StackPanel Grid.Column="0">
+
+            <!-- Iteration control-->
+            <GroupBox Header="Iteration control (min/max)">
+                <StackPanel Margin="0 5">
+
+                    <!-- red-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Red" Grid.Column="0" Foreground="Red"/>
+                        <xctk:IntegerUpDown Name="RedMin" Minimum="0" Grid.Column="1"/>
+                        <xctk:IntegerUpDown Name="RedMax" Minimum="0" Grid.Column="2"/>
+                    </Grid>
+
+                    <!-- green-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Green" Grid.Column="0" Foreground="Green"/>
+                        <xctk:IntegerUpDown Name="GreenMin" Minimum="0" Grid.Column="1"/>
+                        <xctk:IntegerUpDown Name="GreenMax" Minimum="0" Grid.Column="2"/>
+                    </Grid>
+
+                    <!-- blue-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Blue" Grid.Column="0" Foreground="Blue"/>
+                        <xctk:IntegerUpDown Name="BlueMin" Minimum="0" Grid.Column="1"/>
+                        <xctk:IntegerUpDown Name="BlueMax" Minimum="0" Grid.Column="2"/>
+
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Rendering settings-->
+            <GroupBox Header="Rendering settings">
+                <StackPanel Margin="5">
+                    <Label Name="LuminosityLabel" Content="Luminosity"/>
+                    <Slider Name="LuminositySlider" Maximum="128" Value="1" IsEnabled="True" ValueChanged="LuminositySlider_ValueChanged"/>
+                    <Label Name="ContrastLabel" Content="Contrast"/>
+                    <Slider Name="ContrastSlider" Maximum="5" Value="1.5" IsEnabled="True" ValueChanged="ContrastSlider_ValueChanged"/>
+                    <Label Name="FpsLabel" Content="fps"/>
+                    <Slider Name="FpsSlider" ValueChanged="FpsSlider_ValueChanged" Value="1" Minimum="0.1"  Maximum="2" IsEnabled="True"/>
+
+                    <Grid Margin="0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Size W*H" Grid.Column="0"/>
+                        <xctk:IntegerUpDown Name="mainWidth" Minimum="1" Value="640" Grid.Column="1" IsEnabled="False"/>
+                        <xctk:IntegerUpDown Name="mainHeight" Minimum="1" Value="480" Grid.Column="2" IsEnabled="False"/>
+
+                    </Grid>
+                    
+                </StackPanel>
+            </GroupBox>
+
+            <!-- control -->
+            <GroupBox Header="Controls" Margin="0 5">
+                <StackPanel Margin="0">
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Threads" Grid.Column="0"/>
+                        <xctk:IntegerUpDown Name="NumThread" ValueChanged="NumThread_ValueChanged" Minimum="0" Grid.Column="1" IsEnabled="False"/>
+                    </Grid>
+                    <Button Name="StartButton" Click="StartButton_Click" Content="Start" Margin="0,2" IsEnabled="False"/>
+                    <Button Name="StopButton"  Click="StopButton_Click" Content="Stop" Margin="0,2" IsEnabled="False"/>
+                    <Button Name="ResetButton" Click="ResetButton_Click" Content="Reset" Margin="0,2" IsEnabled="False"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Advanced -->
+            <GroupBox Header="Advanced" Margin="0 5">
+                <StackPanel IsEnabled="False">
+                    <Button Name="ConvolutionButton" Content="Convolution" Margin="0 2" IsEnabled="False"/>
+                    <Button Name="DebugButton" Click="DebugButton_Click" Content="Debug" Margin="0 2"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Main-->
+            <GroupBox Header="Main" Margin="0 5">
+                <StackPanel>
+                    <Button Name="SaveButton" Click="SaveButton_Click" Content="Save as ..." Margin="0,2" IsEnabled="False"/>
+                    <Button Name="QuitButton" Click="QuitButton_Click" Content="Quit" Margin="0,2"/>
+
+                </StackPanel>
+            </GroupBox>
+            
+            <!-- Debug -->
+            <GroupBox Header="Pipelines" Margin="0 5">
+                <StackPanel>
+                    <Grid>
+                        <ProgressBar Name="RandomBufferProgressBar" Minimum="0" Maximum="32000" Height="20" />
+                        <TextBlock Text="Random pipeline" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Grid>
+                        <ProgressBar Name="BufferFilteredProgressBar" Minimum="0" Maximum="32000" Height="20"/>
+                        <TextBlock Text="Filter pipeline" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Grid>
+                        <ProgressBar Name="BufferFiltered2ProgressBar" Minimum="0" Maximum="32000" Height="20"/>
+                        <TextBlock Text="Filter2 pipeline" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <TextBlock Name="RandGeneratorLabel" Text="Rand generator"/>
+                    <TextBlock Name="OrbitCountLabel" Text="Orbit count"/>
+                    <TextBlock Name="RandOrbitRatio" Text="Rand/Orbit ratio"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+
+        <!-- RIGHT PANEL-->
+        <!--<Rectangle Name="FractalImage" Grid.Column="1">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <LinearGradientBrush.RelativeTransform>
+                        <TransformGroup>
+                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                            <RotateTransform Angle="90" CenterY="0.5" CenterX="0.5"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </LinearGradientBrush.RelativeTransform>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        -->
+
+        <Image  Name="FractalImage" Grid.Column="1" 
+                MouseWheel="FractalImage_MouseWheel" 
+                MouseLeftButtonDown="FractalImage_MouseLeftButtonDown" 
+                MouseLeftButtonUp="FractalImage_MouseLeftButtonUp"
+                SizeChanged="FractalImage_SizeChanged"
+                Margin="5"
+         />
+
+    </Grid>
+
+</Window>
