@@ -232,6 +232,11 @@ namespace Buddhanet
 
         }
 
+        private void HelpMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.MessageBox.Show($"You can do it ! Good luck ! =^_^=");
+        }
+
         private void FractalImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point clickPoint = e.GetPosition(FractalImage);

@@ -8,16 +8,34 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="900" Width="1600">
 
-    <!-- MAIN-->
-    <Grid MinWidth="400" Margin="0">
+    
+    <StackPanel>
+        <!-- Main Menu -->
+        <Menu IsMainMenu="True">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Save as ..." Click="SaveButton_Click" />
+                <MenuItem Header="_Exit" Click="QuitButton_Click"/>
+            </MenuItem>
+<!--
+            <MenuItem Header="_Edit" />
+            <MenuItem Header="_View" />
+            <MenuItem Header="_Window" />
+ -->
+            <MenuItem Header="_Help" Click="HelpMenuItem_Click"/>
+        </Menu>
 
-        <Grid.ColumnDefinitions>
+        <!-- MAIN-->
+        <Grid MinWidth="400" Margin="0">
+            <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT PANEL-->
+    
+            
+            <!-- LEFT PANEL-->
         <StackPanel Grid.Column="0">
+
 
             <!-- Iteration control-->
             <GroupBox Header="Iteration control (min/max)">
@@ -72,6 +90,7 @@
                     <Label Name="FpsLabel" Content="fps"/>
                     <Slider Name="FpsSlider" ValueChanged="FpsSlider_ValueChanged" Value="1" Minimum="0.1"  Maximum="2" IsEnabled="True"/>
 
+                    <!--
                     <Grid Margin="0 5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -83,6 +102,7 @@
                         <xctk:IntegerUpDown Name="mainHeight" Minimum="1" Value="480" Grid.Column="2" IsEnabled="False"/>
 
                     </Grid>
+                    -->
                     
                 </StackPanel>
             </GroupBox>
@@ -105,23 +125,14 @@
             </GroupBox>
 
             <!-- Advanced -->
-            <GroupBox Header="Advanced" Margin="0 5">
-                <StackPanel IsEnabled="False">
-                    <Button Name="ConvolutionButton" Content="Convolution" Margin="0 2" IsEnabled="False"/>
-                    <Button Name="DebugButton" Click="DebugButton_Click" Content="Debug" Margin="0 2"/>
-                </StackPanel>
-            </GroupBox>
+                <GroupBox Header="Advanced" Margin="0 5">
+                    <StackPanel IsEnabled="False">
+                        <Button Name="ConvolutionButton" Content="Convolution" Margin="0 2" IsEnabled="False"/>
+                        <Button Name="DebugButton" Click="DebugButton_Click" Content="Debug" Margin="0 2"/>
+                    </StackPanel>
+                </GroupBox>
 
-            <!-- Main-->
-            <GroupBox Header="Main" Margin="0 5">
-                <StackPanel>
-                    <Button Name="SaveButton" Click="SaveButton_Click" Content="Save as ..." Margin="0,2" IsEnabled="True"/>
-                    <Button Name="QuitButton" Click="QuitButton_Click" Content="Quit" Margin="0,2"/>
-
-                </StackPanel>
-            </GroupBox>
-            
-            <!-- Debug -->
+                <!-- Debug -->
             <GroupBox Header="Pipelines" Margin="0 5">
                 <StackPanel>
                     <Grid>
@@ -168,6 +179,7 @@
                 Margin="5"
          />
 
-    </Grid>
 
+    </Grid>
+    </StackPanel>
 </Window>
