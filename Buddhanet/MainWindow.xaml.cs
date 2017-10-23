@@ -60,9 +60,9 @@ namespace Buddhanet
 
             //Set Default Values
             FpsSlider.Value = 1;
-            RedMin.Value = 100; RedMax.Value = 200;
-            GreenMin.Value = 150; GreenMax.Value = 250;
-            BlueMin.Value = 200; BlueMax.Value = 300;
+            RedMin.Value = 500; RedMax.Value = 1000;
+            GreenMin.Value = 750; GreenMax.Value = 1250;
+            BlueMin.Value = 1000; BlueMax.Value = 1500;
 
             rmin = (int)RedMin.Value;
             rmax = (int)RedMax.Value;
@@ -110,7 +110,7 @@ namespace Buddhanet
             /* Iterative rejection test */
             var stage3 = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2));
             var stage3b = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
-            var stage3c = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
+            //var stage3c = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3d = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3e = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3f = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
@@ -122,14 +122,14 @@ namespace Buddhanet
             var stage4 = f.StartNew(() => Buddhapipeline.complexToBuffer(bufferFiltered2, minRe, maxRe, minIm, maxIm));
 
             //Non-pipeline task
-            var screenUpdateTask = f.StartNew(() => screenUpdater());
+            var screenUpdateTask = f.StartNew(() => screenUpdater(pBackBuffer));
 
         }
 
         /*
          * This one is called to update & post process the render view
          */
-        void screenUpdater()
+        void screenUpdater(IntPtr pBuffer)
         {
             while (true)
             {
@@ -150,11 +150,11 @@ namespace Buddhanet
                     }
                 }
 
-                lock (bmp)    //Should do something in order to not update the bmp while saving. but locking sux.
-                {
-                    Parallel.For(0, imageHeight, item =>
+                //lock (bmp)    //Should do something in order to not update the bmp while saving. but locking sux.
+                //{
+                    Parallel.For(1, imageHeight , item =>
                     {
-                        for (int i = 0; i < imageWidth; i++)
+                        for (int i = 0; i < imageWidth -1 ; i++)
                         {
                             int r = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)redmax) * 255), contrast) + luminosity, 255.0);
                             int g = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 1] / (float)greenmax) * 255), contrast) + luminosity, 255.0);
@@ -164,13 +164,21 @@ namespace Buddhanet
                             c |= g << 8;
                             c |= r;
                             int offset = (i * 4) + (item * MainWindow.imageWidth * 4);
-                            unsafe { Marshal.WriteInt32((IntPtr)pBackBuffer, offset, c); }
+                            //unsafe { Marshal.WriteInt32((IntPtr)pBackBuffer, offset, c); }
+                            //IntPtr pBackBuffer = (bmp.BackBuffer);
+                            //IntPtr pPixel = IntPtr.Add(pBackBuffer, offset);
+                            unsafe
+                            {
+                                long pPixel = (long)pBuffer + offset;
+                                //pPixel += offset;
+                                *((long*)pPixel) = c;
+                            }
                         }
 
                     });
                     Thread.Sleep((int)(1000 / fps));
                     //Debug.WriteLine(max);
-                }
+                //}
                 //lock (pauseLock) { }; // Should we lock the screenUpdater while pausing ? i doubt it...
             }
         }

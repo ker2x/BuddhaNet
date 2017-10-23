@@ -23,12 +23,14 @@ namespace Buddhanet
             while(true)
             {
                 lock (MainWindow.pauseLock) { };
-                output.Add(
+                Complex c =
                     new Complex(
                         rand.NextDouble() * (maxRe - minRe) + minRe,
                         rand.NextDouble() * (maxIm - minIm) + minIm
-                    )
-                );
+                    );
+                if (Complex.Abs(c) > 2.0) continue;
+                output.Add(c);
+
                 MainWindow.randCounter += 1;
             }
          }
@@ -40,7 +42,6 @@ namespace Buddhanet
          {
             foreach(var item in input.GetConsumingEnumerable())
             {
-                if (Complex.Abs(item) > 2.0) continue;
                 if ((Complex.Abs(1.0 - Complex.Sqrt(Complex.One - (4 * item))) < 1.0)) continue;
                 if (((Complex.Abs(item - new Complex(-1, 0))) < 0.25)) continue;
                 if ((((item.Real + 1.309) * (item.Real + 1.309)) + item.Imaginary * item.Imaginary) < 0.00345) continue;
