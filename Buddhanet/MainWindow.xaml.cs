@@ -33,17 +33,19 @@ namespace Buddhanet
         WriteableBitmap bmp;
         Random rand = new Random();
         IntPtr pBackBuffer;
-        BlockingCollection<Complex> bufferComplex, bufferFiltered, bufferFiltered2;
+        BlockingCollection<Complex> bufferComplex, bufferFiltered, bufferFiltered2, bufferScreen;
         Stopwatch stopwatch;
 
-        public static int imageWidth = 2560;
-        public static int imageHeight = 1440;
+        public static int imageWidth = 3840;
+        public static int imageHeight = 2160;
         public static long randCounter = 0;
         public static int orbitCounter = 0;
-        public static int[,,] screenBuffer = new int[2560, 1440,3];
+        public static int[,,] screenBuffer = new int[imageWidth, imageHeight,3];
         public static double maxRe, minRe, maxIm, minIm;
         public static int minIter = 100;
         public static int maxIter = 2000;
+        public static bool isPaused = false;
+        public static object pauseLock = new object();
 
         double contrast, luminosity;
         double fps = 1;
@@ -60,7 +62,7 @@ namespace Buddhanet
             RedMin.Value = 10; RedMax.Value = 20;
             GreenMin.Value = 15; GreenMax.Value = 25;
             BlueMin.Value = 20; BlueMax.Value = 30;
-            NumThread.Value = 1;
+            //NumThread.Value = 1;
 
             minRe = -2.0 / 1.2;
             maxRe = 2.0 / 1.2;
@@ -80,7 +82,7 @@ namespace Buddhanet
             bufferComplex = new BlockingCollection<Complex>(32000);
             bufferFiltered = new BlockingCollection<Complex>(32000);
             bufferFiltered2 = new BlockingCollection<Complex>(32000);
-            var bufferScreen = new BlockingCollection<Complex>(32000);
+            bufferScreen = new BlockingCollection<Complex>(32000);
 
 
 
@@ -92,17 +94,17 @@ namespace Buddhanet
 
             /* Quick rejection test */
             var stage2 = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
-            //var stage2b = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
-            //var stage2c = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
+            var stage2b = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
+            var stage2c = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
             //var stage2d = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
 
             /* Iterative rejection test */
             var stage3 = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2));
             var stage3b = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             var stage3c = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
-            var stage3d = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
-            var stage3e = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
-            var stage3f = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
+            //var stage3d = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
+            //var stage3e = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
+            //var stage3f = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3g = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3h = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
 
@@ -128,26 +130,30 @@ namespace Buddhanet
                 {
                     for (int i = 0; i < imageWidth; i++)
                     {
-                        max = Math.Max(max, screenBuffer[i, j,0]);
+                        max = Math.Max(max, screenBuffer[i, j, 0]);
                     }
                 }
 
-                Parallel.For(0, imageHeight, item =>
+                lock (bmp)    //Should do something in order to not update the bmp while saving. but locking sux.
                 {
-                    for (int i = 0; i < imageWidth; i++)
+                    Parallel.For(0, imageHeight, item =>
                     {
-                        int newval = (int)Math.Min(Math.Pow(((screenBuffer[i, item,0] / (float)max) * 255), contrast) + luminosity, 255.0);
-                        int c;
-                        c = newval << 16;
-                        c |= newval << 8;
-                        c |= newval;
-                        int offset = (i * 4) + (item * MainWindow.imageWidth * 4);
-                        unsafe { Marshal.WriteInt32((IntPtr)pBackBuffer, offset, c); }
-                    }
+                        for (int i = 0; i < imageWidth; i++)
+                        {
+                            int newval = (int)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)max) * 255), contrast) + luminosity, 255.0);
+                            int c;
+                            c = newval << 16;
+                            c |= newval << 8;
+                            c |= newval;
+                            int offset = (i * 4) + (item * MainWindow.imageWidth * 4);
+                            unsafe { Marshal.WriteInt32((IntPtr)pBackBuffer, offset, c); }
+                        }
 
-                });
-                Thread.Sleep((int)(1000/fps));
-                //Debug.WriteLine(max);
+                    });
+                    Thread.Sleep((int)(1000 / fps));
+                    //Debug.WriteLine(max);
+                }
+                //lock (pauseLock) { }; // Should we lock the screenUpdater while pausing ? i doubt it...
             }
         }
 
@@ -178,26 +184,25 @@ namespace Buddhanet
         {
 
 
-
-            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-            saveFileDialog.DefaultExt = ".png";
-            saveFileDialog.Filter = "PNG (.png)|*.png";
-            Nullable<bool> result = saveFileDialog.ShowDialog();
-            if (result == true)
+            lock (bmp)
             {
-                //saveFileDialog.FileName;
-                //DO STUFF HERE
+                Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+                saveFileDialog.DefaultExt = ".png";
+                saveFileDialog.Filter = "PNG (.png)|*.png";
+                Nullable<bool> result = saveFileDialog.ShowDialog();
+                if (result == true)
+                {
+                    FileStream stream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(bmp));
+                    encoder.Save(stream);
 
-                FileStream stream = new FileStream(saveFileDialog.FileName, FileMode.Create);
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
-                encoder.Save(stream);
-
-                System.Windows.MessageBox.Show($"File saved : {saveFileDialog.FileName}");
+                    System.Windows.MessageBox.Show($"File saved : {saveFileDialog.FileName}");
+                }
+                else
+                {
+                }
             }
-            else
-            {
-            }            
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -235,6 +240,24 @@ namespace Buddhanet
         private void HelpMenuItem_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.MessageBox.Show($"You can do it ! Good luck ! =^_^=");
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(isPaused)
+            {
+                isPaused = false;
+                PauseButton.Content = "Pause";
+                Monitor.Exit(pauseLock);
+                stopwatch.Start();
+            }
+            else
+            {
+                Monitor.Enter(pauseLock);
+                isPaused = true;
+                PauseButton.Content = "Continue";
+                stopwatch.Stop();
+            }
         }
 
         private void FractalImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

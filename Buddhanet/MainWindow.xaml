@@ -110,6 +110,7 @@
             <!-- control -->
             <GroupBox Header="Controls" Margin="0 5">
                 <StackPanel Margin="0">
+                    <!--
                     <Grid Margin="0,2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
@@ -118,10 +119,14 @@
                         <Label Content="Threads" Grid.Column="0"/>
                         <xctk:IntegerUpDown Name="NumThread" ValueChanged="NumThread_ValueChanged" Minimum="0" Grid.Column="1" IsEnabled="False"/>
                     </Grid>
+                    -->
+                    <Button Name="PauseButton" Click="PauseButton_Click" Content="Pause" Margin="0,2" IsEnabled="True"/>
+                        <!--
                     <Button Name="StartButton" Click="StartButton_Click" Content="Start" Margin="0,2" IsEnabled="False"/>
                     <Button Name="StopButton"  Click="StopButton_Click" Content="Stop" Margin="0,2" IsEnabled="False"/>
+                    -->
                     <Button Name="ResetButton" Click="ResetButton_Click" Content="Reset" Margin="0,2" IsEnabled="False"/>
-                </StackPanel>
+                    </StackPanel>
             </GroupBox>
 
             <!-- Advanced -->

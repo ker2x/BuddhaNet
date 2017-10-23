@@ -22,6 +22,7 @@ namespace Buddhanet
 
             while(true)
             {
+                lock (MainWindow.pauseLock) { };
                 output.Add(
                     new Complex(
                         rand.NextDouble() * (maxRe - minRe) + minRe,
