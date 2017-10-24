@@ -29,9 +29,10 @@ namespace Buddhanet
                         rand.NextDouble() * (maxIm - minIm) + minIm
                     );
                 if (Complex.Abs(c) > 2.0) continue;
+
                 output.Add(c);
 
-                MainWindow.randCounter += 1;
+                System.Threading.Interlocked.Increment(ref MainWindow.randCounter);
             }
          }
 
@@ -83,7 +84,7 @@ namespace Buddhanet
                 int iter = 0;
                 Complex z = Complex.Zero;
                 int x, y;
-                MainWindow.orbitCounter++;
+                System.Threading.Interlocked.Increment(ref MainWindow.orbitCounter);
                 while((Complex.Abs(z) < 4 && iter < MainWindow.maxIter))
                 {
                     iter++;
@@ -93,9 +94,9 @@ namespace Buddhanet
                     if (x > 0 && y > 0 && x < MainWindow.imageWidth && y < MainWindow.imageHeight && iter > MainWindow.minIter)
                     {
                         //MainWindow.screenBuffer[x, y,0]++;
-                        if(iter >= MainWindow.rmin && iter <= MainWindow.rmax) MainWindow.screenBuffer[x, y, 0]++;
-                        if (iter >= MainWindow.gmin && iter <= MainWindow.gmax) MainWindow.screenBuffer[x, y, 1]++;
-                        if (iter >= MainWindow.bmin && iter <= MainWindow.bmax) MainWindow.screenBuffer[x, y, 2]++;
+                        if (iter >= MainWindow.rmin && iter <= MainWindow.rmax) System.Threading.Interlocked.Increment(ref MainWindow.screenBuffer[x, y, 0]);
+                        if (iter >= MainWindow.gmin && iter <= MainWindow.gmax) System.Threading.Interlocked.Increment(ref MainWindow.screenBuffer[x, y, 1]);
+                        if (iter >= MainWindow.bmin && iter <= MainWindow.bmax) System.Threading.Interlocked.Increment(ref MainWindow.screenBuffer[x, y, 2]);
                     }
                 }
 

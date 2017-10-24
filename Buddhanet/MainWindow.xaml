@@ -85,7 +85,7 @@
                 <StackPanel Margin="5">
                     <Label Name="LuminosityLabel" Content="Luminosity"/>
                     <Slider Name="LuminositySlider" Maximum="10" Value="1" IsEnabled="True" ValueChanged="LuminositySlider_ValueChanged"/>
-                    <Label Name="ContrastLabel" Content="Contrast"/>
+                    <Label Name="ContrastLabel" Content="Gamma"/>
                     <Slider Name="ContrastSlider" Maximum="5" Value="1.5" IsEnabled="True" ValueChanged="ContrastSlider_ValueChanged"/>
                     <Label Name="FpsLabel" Content="fps"/>
                     <Slider Name="FpsSlider" ValueChanged="FpsSlider_ValueChanged" Value="1" Minimum="0.1"  Maximum="3" IsEnabled="True"/>
@@ -138,17 +138,17 @@
                 </GroupBox>
 
                 <!-- Debug -->
-            <GroupBox Header="Pipelines" Margin="0 5">
-                <StackPanel>
+            <GroupBox Header="Debug / benchmark" Margin="0 5">
+                <StackPanel Margin="0 5">
                     <Grid>
-                        <ProgressBar Name="RandomBufferProgressBar" Minimum="0" Maximum="32000" Height="20" />
+                        <ProgressBar Name="RandomBufferProgressBar" Minimum="0" Maximum="32000" Height="20"/>
                         <TextBlock Text="Random pipeline" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
-                    <Grid>
+                        <Grid>
                         <ProgressBar Name="BufferFilteredProgressBar" Minimum="0" Maximum="32000" Height="20"/>
                         <TextBlock Text="Filter pipeline" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
-                    <Grid>
+                        <Grid>
                         <ProgressBar Name="BufferFiltered2ProgressBar" Minimum="0" Maximum="32000" Height="20"/>
                         <TextBlock Text="Filter2 pipeline" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>

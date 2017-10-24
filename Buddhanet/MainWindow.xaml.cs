@@ -48,7 +48,7 @@ namespace Buddhanet
         public static object pauseLock = new object();
         public static int rmin, rmax, gmin, gmax, bmin, bmax;
 
-        double contrast, luminosity;
+        double gamma, luminosity;
         double fps = 1;
 
         public MainWindow()
@@ -103,13 +103,13 @@ namespace Buddhanet
 
             /* Quick rejection test */
             var stage2 = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
-            var stage2b = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
-            var stage2c = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
+            //var stage2b = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
+            //var stage2c = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
             //var stage2d = f.StartNew(() => Buddhapipeline.quickRejectionFilter(bufferComplex, bufferFiltered));
 
             /* Iterative rejection test */
             var stage3 = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2));
-            var stage3b = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
+            //var stage3b = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3c = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3d = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
             //var stage3e = f.StartNew(() => Buddhapipeline.iterativeRejectionFilter(bufferFiltered, bufferFiltered2)); //it's a slow stage so let's add more
@@ -151,19 +151,19 @@ namespace Buddhanet
                     }
                 }
 
-                //lock (bmp)    //Should do something in order to not update the bmp while saving. but locking sux.
-                //{
+                lock (bmp)    //Should do something in order to not update the bmp while saving. but locking sux.
+                {
                 Parallel.For(1, imageHeight, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount / 2 } , item =>
                     {
                         for (int i = 0; i < imageWidth -1 ; i++)
                         {
-                            uint r = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)redmax) * 255), contrast) * luminosity, 255.0);
-                            uint g = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 1] / (float)greenmax) * 255), contrast) * luminosity, 255.0);
-                            uint b = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 2] / (float)bluemax) * 255), contrast) * luminosity, 255.0);
+                            uint r = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 0] / (float)redmax) * 255.0), gamma) * luminosity, 255.0);
+                            uint g = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 1] / (float)greenmax) * 255.0), gamma) * luminosity, 255.0);
+                            uint b = (uint)Math.Min(Math.Pow(((screenBuffer[i, item, 2] / (float)bluemax) * 255.0), gamma) * luminosity, 255.0);
                             uint c;
-                            c = b << 16;
+                            c = r << 16;
                             c |= g << 8;
-                            c |= r;
+                            c |= b;
                             unsafe
                             {
                                 *((uint*)pBuffer + i + item * MainWindow.imageWidth) = c;
@@ -172,7 +172,7 @@ namespace Buddhanet
 
                     });
                     Thread.Sleep((int)(1000 / fps));
-                //}
+                }
                 //lock (pauseLock) { }; // Should we lock the screenUpdater while pausing ? i doubt it...
             }
         }
@@ -203,7 +203,7 @@ namespace Buddhanet
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
 
-
+            //TODO : BUG BUG BUG ! Can't save twice on same file.
             lock (bmp)
             {
                 Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
@@ -216,6 +216,8 @@ namespace Buddhanet
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
                     encoder.Frames.Add(BitmapFrame.Create(bmp));
                     encoder.Save(stream);
+                    encoder.Frames.Clear();
+                    stream.Close();
 
                     System.Windows.MessageBox.Show($"File saved : {saveFileDialog.FileName}");
                 }
@@ -295,7 +297,7 @@ namespace Buddhanet
 
         private void HelpMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.MessageBox.Show($"You can do it ! Good luck ! =^_^=");
+            System.Windows.MessageBox.Show($"Beta Version 0.3\r\nSource code : https://github.com/ker2x/buddhanet");
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
@@ -348,7 +350,7 @@ namespace Buddhanet
 
         private void ContrastSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            contrast = e.NewValue;
+            gamma = e.NewValue;
         }
 
         private void LuminositySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
